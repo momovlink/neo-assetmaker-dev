@@ -201,14 +201,21 @@ class VideoProcessor:
             cmd.extend(["-vf", ",".join(filters)])
 
         cmd.extend([
-            "-c:v", "h264_nvenc",
-            "-preset", "p7",
-            "-qp", "26",
-            "-rc", "constqp",
+            "-c:v", "h264_qsv",
+            "-preset", "veryslow",
+            "-global_quality", "26",
+            "-profile:v", "high",
+            "rc", "icq",
+            #"-look_ahead", "1",
+            #"-look_ahead_depth", "20",
+            "-extbrc", "1",
+            "-adaptive_i", "1",
             "-spatial-aq", "1",
             "-temporal-aq", "1",
-            "-g", "320",
-            "-bf", "4",
+            "-g", "480",
+            "-adaptive_b", "1",
+            "-b_strategy", "1",
+            "-forced_idr", "1",
             "-pix_fmt", "yuv420p",
             "-an",  # 无音频
             output_path
@@ -282,7 +289,7 @@ class VideoProcessor:
         filter_str = ",".join(filters)
 
         return (f'ffmpeg -i "{input_path}" -vf "{filter_str}" '
-                f'-c:v h264_nvenc -preset p7 -qp 26 -rc constqp -spatial-aq 1 -temporal-aq 1 -g 320 -bf 4  -refs 4 -pix_fmt yuv420p '
+                f'-c:v h264_qsv -preset veryslow -profile:v high -global_quality 26 -rc icq -extbrc 1 -g 480 -bf 4 -adaptive_i 1 -adaptive_b 1 -b_strategy 1 -forced_idr 1 -pix_fmt yuv420p '
                 f'-an "{output_path}"')
 
     def get_resolution_info(self, resolution: str) -> Dict[str, Any]:

@@ -373,8 +373,8 @@ class ExportWorker(QThread):
         替代之前逐帧 numpy 拼接的方式，性能更优。
         参考: https://ffmpeg.org/ffmpeg-filters.html#pad
         """
-        qp_value = "26"
-        preset = "p7"
+        icq_value = "26"
+        preset = "veryslow"
 
         vf_filters = []
         if padded_w > 0 and padded_h > 0:
@@ -389,21 +389,28 @@ class ExportWorker(QThread):
         if vf_filters:
             cmd.extend(["-vf", ",".join(vf_filters)])
         cmd.extend([
-            "-c:v", "h264_nvenc",
+            "-c:v", "h264_qsv",
             "-preset", preset,
-            "-qp", str(qp_value),
-            "-rc", "constqp",
+            "-global_quality", str(icq_value),
+            "-profile:v", "high",
+            #"-look_ahead", "1",
+            #"-look_ahead_depth", "20",
+            "-extbrc", "1",
+            "-rc", "icq",
+            "-adaptive_i", "1",
             "-spatial-aq", "1",
             "-temporal-aq", "1",
-            "-g", "320",
-            "-bf", "4",
+            "-g", "480",
+            "-adaptive_b", "1",
+            "-b_strategy", "1",
+            "-forced_idr", "1",
             "-pix_fmt", "yuv420p",
             "-an",  # 无音频
             "-y",
             output_file
         ])
 
-        logger.info(f"执行ffmpeg QP编码 (qp={qp_value}, preset={preset}): {' '.join(cmd)}")
+        logger.info(f"执行ffmpeg ICQ编码 (icq={icq_value}, preset={preset}): {' '.join(cmd)}")
 
         popen_kwargs = {
             'stdout': subprocess.PIPE,
@@ -438,10 +445,10 @@ class ExportWorker(QThread):
 
         if returncode != 0:
             stderr_msg = stderr[-500:] if stderr else "未知错误"
-            logger.error(f"ffmpeg QP编码 stderr: {stderr}")
-            raise RuntimeError(f"ffmpeg QP编码失败 (code {returncode}): {stderr_msg}")
+            logger.error(f"ffmpeg ICQ编码 stderr: {stderr}")
+            raise RuntimeError(f"ffmpeg ICQ编码失败 (code {returncode}): {stderr_msg}")
 
-        logger.info("QP编码完成")
+        logger.info("ICQ编码完成")
 
     def _export_video_from_image(
         self,
