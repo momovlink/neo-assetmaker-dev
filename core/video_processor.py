@@ -203,7 +203,7 @@ class VideoProcessor:
         cmd.extend([
             "-c:v", "h264_qsv",
             "-preset", "veryslow",
-            "-global_quality", "26",
+            "-global_quality", "28",
             "-profile:v", "high",
             "rc", "icq",
             #"-look_ahead", "1",
@@ -289,7 +289,7 @@ class VideoProcessor:
         filter_str = ",".join(filters)
 
         return (f'ffmpeg -i "{input_path}" -vf "{filter_str}" '
-                f'-c:v h264_qsv -preset veryslow -profile:v high -global_quality 26 -rc icq -extbrc 1 -g 480 -bf 4 -adaptive_i 1 -adaptive_b 1 -b_strategy 1 -forced_idr 1 -pix_fmt yuv420p '
+                f'-c:v h264_qsv -preset veryslow -profile:v high -global_quality 28 -rc icq -extbrc 1 -g 480 -bf 4 -adaptive_i 1 -adaptive_b 1 -b_strategy 1 -forced_idr 1 -pix_fmt yuv420p '
                 f'-an "{output_path}"')
 
     def get_resolution_info(self, resolution: str) -> Dict[str, Any]:

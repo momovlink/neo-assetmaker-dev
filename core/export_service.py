@@ -373,7 +373,7 @@ class ExportWorker(QThread):
         替代之前逐帧 numpy 拼接的方式，性能更优。
         参考: https://ffmpeg.org/ffmpeg-filters.html#pad
         """
-        icq_value = "26"
+        icq_value = "28"
         preset = "veryslow"
 
         vf_filters = []
