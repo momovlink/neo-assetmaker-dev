@@ -373,7 +373,7 @@ class ExportWorker(QThread):
         替代之前逐帧 numpy 拼接的方式，性能更优。
         参考: https://ffmpeg.org/ffmpeg-filters.html#pad
         """
-        crf_value = 26
+        crf_value = 23
         preset = "veryslow"
 
         vf_filters = []
