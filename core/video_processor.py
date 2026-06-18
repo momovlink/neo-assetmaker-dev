@@ -20,7 +20,7 @@ X264_PARAMS = (
     ":bframes=16:b-adapt=2"
     ":me=umh:subme=9:merange=48"
     ":no-fast-pskip=1:direct=auto:no-weightb=0"
-    ":keyint=300:min-keyint=5:ref=16"
+    ":keyint=300:min-keyint=5:ref=3"
     ":chroma-qp-offset=-3"
     ":aq-mode=1:aq-strength=0.6:trellis=2"
     ":deblock=1,1:psy-rd=0.5,0.12"
