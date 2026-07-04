@@ -81,13 +81,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ffmpeg-sdk
-          key: ffmpeg-sdk-win64-7.1-gyan
+          key: ffmpeg-sdk-win64-8.1.2-gyan
 
       - name: Download FFmpeg SDK (for Rust build)
         if: steps.cache-ffmpeg-sdk.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
-          $url = "https://github.com/GyanD/codexffmpeg/releases/download/7.1/ffmpeg-7.1-full_build-shared.7z"
+          $url = "https://github.com/GyanD/codexffmpeg/releases/download/8.1.2/ffmpeg-8.1.2-full_build-shared.7z"
           Invoke-WebRequest -Uri $url -OutFile ffmpeg-sdk.7z
           7z x ffmpeg-sdk.7z -offmpeg-temp
           New-Item -ItemType Directory -Force -Path ffmpeg-sdk
@@ -137,13 +137,13 @@ jobs:
           path: |
             ffmpeg.exe
             ffprobe.exe
-          key: ffmpeg-win64-n7.1-gpl
+          key: ffmpeg-win64-n8.1-gpl
 
       - name: Download FFmpeg
         if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
-          $url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n7.1-latest-win64-gpl-7.1.zip"
+          $url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.1-latest-win64-gpl-8.1.zip"
           Invoke-WebRequest -Uri $url -OutFile ffmpeg.zip
           Expand-Archive -Path ffmpeg.zip -DestinationPath ffmpeg_temp
           $ffmpegExe = Get-ChildItem -Path ffmpeg_temp -Recurse -Filter "ffmpeg.exe" | Select-Object -First 1

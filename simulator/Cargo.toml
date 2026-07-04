@@ -25,7 +25,7 @@ fontdue = "0.8"
 barcoders = "2.0"
 
 # Video decoding via FFmpeg
-ffmpeg-next = "8.0"
+ffmpeg-next = "8.1"
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }

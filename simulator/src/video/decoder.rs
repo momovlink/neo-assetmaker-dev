@@ -12,6 +12,7 @@ use ffmpeg::format::Pixel;
 use ffmpeg::media::Type;
 use ffmpeg::software::scaling::{Context as Scaler, Flags};
 use ffmpeg::util::frame::video::Video as VideoFrame;
+use ffmpeg::codec::threading;
 use ffmpeg_next as ffmpeg;
 
 /// Video decoder that extracts frames from video files using FFmpeg
@@ -89,9 +90,14 @@ impl VideoDecoder {
         };
 
         // Create decoder
-        let context_decoder =
+        let mut context_decoder =
             ffmpeg::codec::context::Context::from_parameters(video_stream.parameters())
                 .context("Failed to create decoder context")?;
+
+        // 启用多线程解码，自动选择最优线程数
+        // count=0 表示 auto（FFmpeg 自动根据 CPU 核心数决定）
+        context_decoder.set_threading(threading::Config::kind(threading::Type::Frame));
+
         let mut decoder = context_decoder
             .decoder()
             .video()
