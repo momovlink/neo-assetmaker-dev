@@ -96,12 +96,7 @@ impl VideoDecoder {
 
         // 启用多线程解码，自动选择最优线程数
         // count=0 表示 auto（FFmpeg 自动根据 CPU 核心数决定）
-        // Type::Frame 启用帧级并行解码，Type::Slice 启用切片级并行
-        context_decoder.set_threading(
-            threading::Config::default()
-                .kind(threading::Type::Frame)
-                .count(0),
-        );
+        context_decoder.set_threading(threading::Config::kind(threading::Type::Frame));
 
         let mut decoder = context_decoder
             .decoder()
