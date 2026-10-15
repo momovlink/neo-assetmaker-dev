@@ -320,7 +320,7 @@ pub struct EPConfig {
 }
 
 fn default_version() -> i32 {
-    1
+    2
 }
 
 fn default_uuid() -> String {
@@ -409,7 +409,7 @@ mod tests {
     #[test]
     fn test_default_config() {
         let config = EPConfig::default();
-        assert_eq!(config.version, 1);
+        assert_eq!(config.version, 2);
         assert_eq!(config.screen, ScreenType::S360x640);
     }
 

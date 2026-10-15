@@ -10,6 +10,11 @@ import os
 
 CONFIG_FILENAME = "epconfig.json"
 
+# 素材格式版本：设备端以「不超过自身支持的上界」校验（drm_app_neo PRTS_ASSET_VERSION_NUMBER = 2）。
+# 当前导出使用 2；设备端接受 version <= 2。
+DEFAULT_VERSION = 2
+MAX_SUPPORTED_VERSION = 2
+
 
 class ScreenType(Enum):
     """屏幕分辨率类型"""
@@ -279,8 +284,8 @@ class Overlay:
 @dataclass
 class EPConfig:
     """epconfig.json 完整数据模型"""
-    version: int = 1
     uuid: str = field(default_factory=lambda: str(uuid_lib.uuid4()))
+    version: int = DEFAULT_VERSION
     name: str = ""
     description: str = ""
     icon: str = ""
@@ -340,7 +345,7 @@ class EPConfig:
         screen = ScreenType.from_string(data.get("screen", "360x640"))
 
         return cls(
-            version=data.get("version", 1),
+            version=data.get("version", DEFAULT_VERSION),
             uuid=data.get("uuid", str(uuid_lib.uuid4())),
             name=data.get("name", ""),
             description=data.get("description", ""),

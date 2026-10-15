@@ -9,6 +9,7 @@ import re
 import uuid
 
 from config.constants import RESOLUTION_SPECS, TRANSITION_TYPES, OVERLAY_TYPES
+from config.epconfig import MAX_SUPPORTED_VERSION
 
 
 class ValidationLevel(Enum):
@@ -131,13 +132,16 @@ class EPConfigValidator:
         self.results.append(ValidationResult(level, field, message))
 
     def _validate_version(self, config: dict):
-        """校验版本号"""
+        """校验版本号：设备端接受 version <= MAX_SUPPORTED_VERSION"""
         version = config.get("version")
         if version is None:
             self._add_result(ValidationLevel.ERROR, "version", "缺少version字段")
-        elif version != 1:
+        elif not isinstance(version, int) or isinstance(version, bool):
             self._add_result(ValidationLevel.ERROR, "version",
-                           f"版本号必须为1，当前为: {version}")
+                           f"版本号必须为整数，当前为: {version}")
+        elif version > MAX_SUPPORTED_VERSION:
+            self._add_result(ValidationLevel.ERROR, "version",
+                           f"版本号不能高于 {MAX_SUPPORTED_VERSION}，当前为: {version}")
 
     def _validate_uuid(self, config: dict):
         """校验UUID"""
