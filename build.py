@@ -344,22 +344,11 @@ def run_cxfreeze(skip_flasher=False):
         "json",
         "uuid",
         "dataclasses",
-        "httpx",
-        "httpcore",
-        "httpx._transports",
-        "keyring",
-        "keyring.backends",
-        "platformdirs",
-        "fido2",
-        "fido2.hid",
-        "fido2.client",
-        "fido2.webauthn",
         # 本地项目包 — 使用 packages 让 cx_Freeze 通过 _import_all_sub_modules 自动发现所有子模块
         "gui",
         "core",
         "config",
         "utils",
-        "_mext",
     ]
 
     includes = [
@@ -497,12 +486,6 @@ def run_cxfreeze(skip_flasher=False):
             plugin_path = os.path.join(pyqt6_plugins, plugin)
             if os.path.exists(plugin_path):
                 include_files.append((plugin_path, f"lib/PyQt6/Qt6/plugins/{plugin}"))
-
-    # libusb DLL（fido2 运行时依赖）
-    libusb_dll = os.path.join(site_packages, "fido2", "libusb-1.0.dll")
-    if os.path.exists(libusb_dll):
-        include_files.append((libusb_dll, "libusb-1.0.dll"))
-        print(f"  Including libusb: {libusb_dll}")
 
     build_options = {
         "packages": packages,

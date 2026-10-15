@@ -6,7 +6,7 @@ Arknights Pass Material Toolbox — 用于制作明日方舟电子通行证 2.1 
 
 ### 素材制作（核心功能）
 
-- 可视化配置编辑界面，支持基础模式和高级模式
+- 可视化配置编辑界面，提供完整配置面板
 - 实时 JSON 配置预览
 - 视频预览与裁剪，支持 0-359° 任意角度旋转
 - 后台线程视频预览，长视频加载不阻塞 UI
@@ -30,14 +30,6 @@ Arknights Pass Material Toolbox — 用于制作明日方舟电子通行证 2.1 
 - 完整播放流程：入场过渡 → 入场视频 → 循环过渡 → 循环视频 + 叠加层
 - 模拟预览会分别继承入场视频和循环视频各自的裁切框、旋转角度与时间轴 in/out，行为与导出保持一致
 - Python ↔ Rust 通过 Windows 命名管道 IPC 通信
-
-### 素材论坛
-
-- 在线素材市场，支持搜索、分类过滤、排序
-- OAuth + FIDO2 认证登录
-- 多线程下载引擎（最多 3 并发）
-- 本地素材库管理
-- USB/MTP 设备管理
 
 ### SSH 远程管理
 
@@ -99,10 +91,9 @@ uv run python main.py
 
 1. **固件烧录** — 为迷你 Linux 手持开发板烧录固件，支持 FEL 模式和 DFU 模式
 2. **素材制作** — 核心功能，创建和编辑通行证素材
-3. **素材论坛** — 在线素材资源下载
-4. **项目介绍** — 访问项目官网获取最新信息
-5. **远程管理** — SSH 远程上传文件到通行证设备
-6. **设置** — 主题、界面、视频、导出、网络等配置
+3. **项目介绍** — 访问项目官网获取最新信息
+4. **远程管理** — SSH 远程上传文件到通行证设备
+5. **设置** — 主题、界面、视频、导出、网络等配置
 
 ### 创建项目
 
@@ -118,9 +109,7 @@ uv run python main.py
 
 ### 配置面板
 
-**基础模式：** 简化界面，适合快速创建素材，仅显示循环视频标签页。
-
-**高级模式：** 完整功能，包含四个选项卡：
+包含四个选项卡：
 
 | 选项卡 | 内容 |
 |--------|------|
@@ -249,13 +238,6 @@ neo-assetmaker/
 │   ├── color_utils.py               # 颜色转换（hex ↔ RGB ↔ BGR）
 │   └── file_utils.py                # 文件操作工具
 │
-├── _mext/                           # 素材论坛扩展模块
-│   ├── core/                        # API 配置、服务管理
-│   ├── services/                    # API 客户端、OAuth 认证、FIDO2、下载引擎、USB/MTP
-│   ├── models/                      # 素材、用户、下载状态数据模型
-│   ├── ui/                          # 市场页、下载页、素材库页、登录页、USB 页、设置页
-│   └── utils/                       # 平台检测、加密工具
-│
 ├── resources/                       # 资源文件
 │   ├── icons/                       # 应用图标
 │   ├── data/                        # 干员信息库、叠加 UI 模板和素材
@@ -320,7 +302,6 @@ GitHub Actions 工作流位于 `.github/workflows/`：
 | GUI | PyQt6 + QFluentWidgets (Fluent Design) | `gui/` |
 | 核心逻辑 | 服务模式、数据类模型 | `core/` |
 | 配置系统 | dataclass + Enum + JSON Schema | `config/` |
-| 扩展模块 | OAuth + PKCE、FIDO2、MTP | `_mext/` |
 | 模拟器 | Rust (egui + FFmpeg) | `simulator/` |
 | IPC | Windows 命名管道 (JSON) | `simulator/src/ipc/` |
 | 视频处理 | PyAV + OpenGL + OpenCV (Python) + FFmpeg (Rust) | `core/`, `gui/widgets/`, `simulator/` |

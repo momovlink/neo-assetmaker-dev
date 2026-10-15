@@ -261,11 +261,6 @@ class MainWindow(QMainWindow):
         self.btn_material.setToolTip("素材制作")
         self.btn_material.setFixedSize(50, 50)
 
-        self.btn_forum = ToolButton(FluentIcon.PEOPLE if hasattr(FluentIcon, 'PEOPLE') else FluentIcon.CHAT, self.sidebar)
-        self.btn_forum.setCheckable(True)
-        self.btn_forum.setToolTip("素材论坛")
-        self.btn_forum.setFixedSize(50, 50)
-
         self.btn_about = ToolButton(FluentIcon.INFO, self.sidebar)
         self.btn_about.setCheckable(True)
         self.btn_about.setToolTip("项目介绍")
@@ -284,7 +279,6 @@ class MainWindow(QMainWindow):
 
         buttons_layout.addWidget(self.btn_firmware)
         buttons_layout.addWidget(self.btn_material)
-        buttons_layout.addWidget(self.btn_forum)
         buttons_layout.addWidget(self.btn_about)
         buttons_layout.addWidget(self.btn_remote)
 
@@ -313,13 +307,10 @@ class MainWindow(QMainWindow):
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
 
         # === 左侧: 配置面板 ===
-        from gui.widgets.basic_config_panel import BasicConfigPanel
-
         self.config_container = QWidget()
         self.config_layout = QVBoxLayout(self.config_container)
 
         from qfluentwidgets import (
-            ComboBox as FluentComboBox,
             DropDownPushButton, RoundMenu, Action
         )
 
@@ -409,27 +400,12 @@ class MainWindow(QMainWindow):
         self.btn_operations.setMenu(operations_menu)
         toolbar_layout.addWidget(self.btn_operations)
 
-        self.settings_mode_combo = FluentComboBox()
-        self.settings_mode_combo.addItem("基础设置", userData="basic")
-        self.settings_mode_combo.addItem("高级设置", userData="advanced")
-        self.settings_mode_combo.setFixedHeight(34)
-        self.settings_mode_combo.currentIndexChanged.connect(
-            self._on_settings_mode_combo_changed)
-        toolbar_layout.addWidget(self.settings_mode_combo)
-
         toolbar_layout.addStretch()
         self.config_layout.addLayout(toolbar_layout)
 
         self.advanced_config_panel = ConfigPanel()
-        self.basic_config_panel = BasicConfigPanel()
 
         self.config_layout.addWidget(self.advanced_config_panel)
-        self.config_layout.addWidget(self.basic_config_panel)
-        self.advanced_config_panel.setVisible(False)
-        self.basic_config_panel.setVisible(True)
-
-        # 基础模式下，只显示循环视频标签页
-        self._show_loop_tab_only()
 
         self.splitter.addWidget(self.config_container)
 
@@ -478,7 +454,8 @@ class MainWindow(QMainWindow):
         self.preview_tabs.addTab(self.video_preview, "循环视频")         # Tab 3
         preview_layout.addWidget(self.preview_tabs, stretch=1)
 
-        self._show_loop_tab_only()
+        # 启动默认停在循环视频页
+        self.preview_tabs.setCurrentIndex(3)
 
         self.timeline = TimelineWidget()
         preview_layout.addWidget(self.timeline)
@@ -613,13 +590,7 @@ class MainWindow(QMainWindow):
         self.advanced_config_panel.transition_image_changed.connect(
             self._on_transition_image_changed)
         self.advanced_config_panel.ssh_upload_requested.connect(self._on_ssh_upload)
-        
-        self.basic_config_panel.config_changed.connect(self._on_config_changed)
-        self.basic_config_panel.video_file_selected.connect(
-            self._on_video_file_selected)
-        self.basic_config_panel.validate_requested.connect(self._on_validate)
-        self.basic_config_panel.export_requested.connect(self._on_export)
-        self.basic_config_panel.ssh_upload_requested.connect(self._on_ssh_upload)
+
         self.btn_save_icon.clicked.connect(self._on_save_captured_icon)
 
         self.transition_preview.transition_crop_changed.connect(
@@ -636,7 +607,6 @@ class MainWindow(QMainWindow):
 
         self.btn_firmware.clicked.connect(self._on_sidebar_firmware)
         self.btn_material.clicked.connect(self._on_sidebar_material)
-        self.btn_forum.clicked.connect(self._on_sidebar_forum)
         self.btn_about.clicked.connect(self._on_sidebar_about)
         self.btn_remote.clicked.connect(self._on_sidebar_remote)
         self.btn_settings.clicked.connect(self._on_sidebar_settings)
@@ -881,31 +851,21 @@ class MainWindow(QMainWindow):
         <h4>2. 素材制作</h4>
         <p>软件的核心功能，用于创建和编辑通行证素材。</p>
         <ul>
-            <li><strong>基础设置</strong>：简化的界面，适合快速创建素材</li>
-            <li><strong>高级设置</strong>：完整的功能界面，支持详细的参数调整</li>
+            <li><strong>配置面板</strong>：完整的配置界面，支持详细的参数调整</li>
             <li><strong>视频预览</strong>：实时预览视频效果</li>
             <li><strong>过渡效果</strong>：支持自定义过渡图片</li>
             <li><strong>时间轴编辑</strong>：精确控制视频片段</li>
             <li><strong>JSON预览</strong>：实时查看生成的配置文件</li>
         </ul>
 
-        <h4>3. 素材论坛</h4>
-        <p>内置素材论坛客户端，提供完整的素材浏览和管理功能。</p>
-        <ul>
-            <li><strong>素材浏览</strong>：搜索、筛选和排序素材资源</li>
-            <li><strong>下载管理</strong>：多任务下载，支持暂停和续传</li>
-            <li><strong>素材库</strong>：管理已下载的素材文件</li>
-            <li><strong>USB 传输</strong>：直接将素材传输到设备</li>
-        </ul>
-
-        <h4>4. 项目介绍</h4>
+        <h4>3. 项目介绍</h4>
         <p>查看项目的详细介绍和最新动态。</p>
         <ul>
             <li><strong>官方网站</strong>：直接访问项目官网获取最新信息</li>
             <li><strong>项目特性</strong>：了解开发板的主要功能和规格</li>
         </ul>
 
-        <h4>5. 设置</h4>
+        <h4>4. 设置</h4>
         <p>自定义软件的各项设置。</p>
         <ul>
             <li><strong>主题设置</strong>：可选择默认主题或自定义主题图片</li>
@@ -998,7 +958,6 @@ class MainWindow(QMainWindow):
         self._is_modified = False
 
         self.advanced_config_panel.set_config(self._config, self._base_dir)
-        self.basic_config_panel.set_config(self._config, self._base_dir)
         self.json_preview.set_config(self._config, self._base_dir)
         self.video_preview.set_epconfig(self._config)
         self._update_title()
@@ -1089,7 +1048,6 @@ class MainWindow(QMainWindow):
         self._intro_in_out = (0, 0)
 
         self.advanced_config_panel.set_config(self._config, self._base_dir)
-        self.basic_config_panel.set_config(self._config, self._base_dir)
         self.json_preview.set_config(self._config, self._base_dir)
         self.video_preview.set_epconfig(self._config)
         self._update_title()
@@ -1137,7 +1095,6 @@ class MainWindow(QMainWindow):
         self._intro_in_out = (0, 0)
 
         self.advanced_config_panel.set_config(self._config, self._base_dir)
-        self.basic_config_panel.set_config(self._config, self._base_dir)
         self.json_preview.set_config(self._config, self._base_dir)
         self.video_preview.set_epconfig(self._config)
 
@@ -1251,7 +1208,6 @@ class MainWindow(QMainWindow):
             self._is_modified = False
 
             self.advanced_config_panel.set_config(self._config, self._base_dir)
-            self.basic_config_panel.set_config(self._config, self._base_dir)
             self.json_preview.set_config(self._config, self._base_dir)
 
             self._update_title()
@@ -1849,7 +1805,6 @@ class MainWindow(QMainWindow):
             return
 
         self.advanced_config_panel.set_config(self._config, self._base_dir)
-        self.basic_config_panel.set_config(self._config, self._base_dir)
         self.json_preview.set_config(self._config, self._base_dir)
         self.video_preview.set_epconfig(self._config)
 
@@ -1881,7 +1836,6 @@ class MainWindow(QMainWindow):
         """侧边栏：固件烧录"""
         self.btn_firmware.setChecked(True)
         self.btn_material.setChecked(False)
-        self.btn_forum.setChecked(False)
         self.btn_about.setChecked(False)
         self.btn_remote.setChecked(False)
         self.btn_settings.setChecked(False)
@@ -1889,8 +1843,6 @@ class MainWindow(QMainWindow):
         self._pause_all_videos()
 
         self.splitter.setVisible(False)
-        if hasattr(self, '_forum_widget'):
-            self._forum_widget.setVisible(False)
         if hasattr(self, '_settings_page'):
             self._settings_page.setVisible(False)
         if hasattr(self, '_about_widget'):
@@ -1916,13 +1868,10 @@ class MainWindow(QMainWindow):
         """侧边栏：素材制作"""
         self.btn_firmware.setChecked(False)
         self.btn_material.setChecked(True)
-        self.btn_forum.setChecked(False)
         self.btn_about.setChecked(False)
         self.btn_remote.setChecked(False)
         self.btn_settings.setChecked(False)
 
-        if hasattr(self, '_forum_widget'):
-            self._forum_widget.setVisible(False)
         if hasattr(self, '_settings_page'):
             self._settings_page.setVisible(False)
         if hasattr(self, '_about_widget'):
@@ -1937,59 +1886,10 @@ class MainWindow(QMainWindow):
 
         self._resume_videos()
 
-    def _on_sidebar_forum(self):
-        """侧边栏：素材论坛"""
-        self.btn_firmware.setChecked(False)
-        self.btn_material.setChecked(False)
-        self.btn_forum.setChecked(True)
-        self.btn_about.setChecked(False)
-        self.btn_remote.setChecked(False)
-        self.btn_settings.setChecked(False)
-
-        self._pause_all_videos()
-
-        self.splitter.setVisible(False)
-        if hasattr(self, '_settings_page'):
-            self._settings_page.setVisible(False)
-        if hasattr(self, '_about_widget'):
-            self._about_widget.setVisible(False)
-        if hasattr(self, '_flasher_widget'):
-            self._flasher_widget.setVisible(False)
-        if hasattr(self, '_remote_page'):
-            self._remote_page.setVisible(False)
-
-        if not hasattr(self, '_forum_widget'):
-            try:
-                from _mext.ui.widget import MaterialForumWidget
-                self._forum_widget = MaterialForumWidget(parent=self)
-                self.content_layout.addWidget(self._forum_widget)
-            except ImportError as exc:
-                logger.error("素材论坛模块加载失败，缺少必要依赖", exc_info=True)
-                missing_pkg = getattr(exc, 'name', None) or str(exc)
-                QMessageBox.warning(
-                    self, "模块加载失败",
-                    f"素材论坛所需的依赖库缺失，请检查安装是否完整。\n\n"
-                    f"缺少的包: {missing_pkg}\n\n"
-                    "可能需要: httpx, keyring, platformdirs, fido2 等。")
-                self._on_sidebar_material()
-                return
-            except Exception as exc:
-                logger.error("素材论坛初始化失败: %s", exc, exc_info=True)
-                QMessageBox.warning(
-                    self, "初始化失败",
-                    f"素材论坛初始化时发生错误:\n{type(exc).__name__}: {exc}\n\n"
-                    "请查看日志文件获取详细信息。")
-                self._on_sidebar_material()
-                return
-
-        self._forum_widget.setVisible(True)
-        self.status_bar.showMessage("素材论坛模式")
-
     def _on_sidebar_about(self):
         """侧边栏：项目介绍"""
         self.btn_firmware.setChecked(False)
         self.btn_material.setChecked(False)
-        self.btn_forum.setChecked(False)
         self.btn_about.setChecked(True)
         self.btn_remote.setChecked(False)
         self.btn_settings.setChecked(False)
@@ -1997,8 +1897,6 @@ class MainWindow(QMainWindow):
         self._pause_all_videos()
 
         self.splitter.setVisible(False)
-        if hasattr(self, '_forum_widget'):
-            self._forum_widget.setVisible(False)
         if hasattr(self, '_settings_page'):
             self._settings_page.setVisible(False)
         if hasattr(self, '_flasher_widget'):
@@ -2113,99 +2011,10 @@ class MainWindow(QMainWindow):
 
         self.status_bar.showMessage("项目介绍")
 
-    def _on_settings_mode_combo_changed(self, index: int):
-        """下拉框切换设置模式"""
-        mode = self.settings_mode_combo.currentData()
-        self._on_settings_mode_changed(mode)
-
-    def _show_loop_tab_only(self):
-        """基础模式：仅显示循环视频标签页"""
-        if not hasattr(self, 'preview_tabs'):
-            return
-
-        tab_bar = self.preview_tabs.tabBar
-        # 阻塞 tabBar 信号，防止 setTabVisible 内部
-        # 发射虚假 currentChanged 导致 stackedWidget 索引被污染
-        tab_bar.blockSignals(True)
-        try:
-            if 3 < self.preview_tabs.count():
-                self.preview_tabs.setTabVisible(3, True)
-            for i in [0, 1, 2]:
-                if i < self.preview_tabs.count():
-                    self.preview_tabs.setTabVisible(i, False)
-        finally:
-            tab_bar.blockSignals(False)
-
-        # 手动设置正确状态
-        self._fix_tab_selected_state(3)
-        self.preview_tabs.stackedWidget.setCurrentIndex(3)
-        if hasattr(self, 'timeline'):
-            self._on_preview_tab_changed(3)
-
-    def _show_all_tabs(self):
-        """高级模式：显示所有标签页"""
-        if not hasattr(self, 'preview_tabs'):
-            return
-
-        tab_bar = self.preview_tabs.tabBar
-        current = tab_bar._currentIndex
-
-        tab_bar.blockSignals(True)
-        try:
-            for i in range(self.preview_tabs.count()):
-                self.preview_tabs.setTabVisible(i, True)
-        finally:
-            tab_bar.blockSignals(False)
-
-        self._fix_tab_selected_state(current)
-        self.preview_tabs.stackedWidget.setCurrentIndex(current)
-        if hasattr(self, 'timeline'):
-            self._on_preview_tab_changed(current)
-
-    def _fix_tab_selected_state(self, active_index: int):
-        """强制清理 TabBar 所有 item 的 isSelected，仅保留指定索引"""
-        tab_bar = self.preview_tabs.tabBar
-        for idx, item in enumerate(tab_bar.items):
-            item.setSelected(idx == active_index)
-        tab_bar._currentIndex = active_index
-
-    def _on_settings_mode_changed(self, mode):
-        """设置模式切换"""
-        try:
-            if mode == "basic":
-                # 切换前先同步，避免丢失高级面板的修改
-                if self.advanced_config_panel.isVisible():
-                    self.advanced_config_panel.update_config_from_ui()
-
-                self.advanced_config_panel.setVisible(False)
-                self.basic_config_panel.setVisible(True)
-
-                if self._config:
-                    self.basic_config_panel.set_config(self._config, self._base_dir)
-
-                self.status_bar.showMessage("基础设置模式 - 简化界面")
-                self._show_loop_tab_only()
-            elif mode == "advanced":
-                # 切换前先同步，避免丢失基础面板的修改
-                if self.basic_config_panel.isVisible():
-                    self.basic_config_panel.update_config_from_ui()
-
-                self.advanced_config_panel.setVisible(True)
-                self.basic_config_panel.setVisible(False)
-
-                if self._config:
-                    self.advanced_config_panel.set_config(self._config, self._base_dir)
-
-                self.status_bar.showMessage("高级设置模式 - 完整界面")
-                self._show_all_tabs()
-        except Exception as e:
-            logger.error(f"设置模式切换错误: {e}")
-
     def _on_sidebar_remote(self):
         """侧边栏：远程管理"""
         self.btn_firmware.setChecked(False)
         self.btn_material.setChecked(False)
-        self.btn_forum.setChecked(False)
         self.btn_about.setChecked(False)
         self.btn_remote.setChecked(True)
         self.btn_settings.setChecked(False)
@@ -2213,8 +2022,6 @@ class MainWindow(QMainWindow):
         self._pause_all_videos()
 
         self.splitter.setVisible(False)
-        if hasattr(self, '_forum_widget'):
-            self._forum_widget.setVisible(False)
         if hasattr(self, '_settings_page'):
             self._settings_page.setVisible(False)
         if hasattr(self, '_about_widget'):
@@ -2245,15 +2052,12 @@ class MainWindow(QMainWindow):
         """侧边栏：设置"""
         self.btn_firmware.setChecked(False)
         self.btn_material.setChecked(False)
-        self.btn_forum.setChecked(False)
         self.btn_about.setChecked(False)
         self.btn_remote.setChecked(False)
         self.btn_settings.setChecked(True)
 
         self._pause_all_videos()
 
-        if hasattr(self, '_forum_widget'):
-            self._forum_widget.setVisible(False)
         self.splitter.setVisible(False)
         if hasattr(self, '_about_widget'):
             self._about_widget.setVisible(False)
@@ -2308,42 +2112,6 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logger.error(f"文件菜单错误: {e}")
             show_error(e, "文件菜单", self)
-
-    def _on_nav_basic(self):
-        """顶部导航：基础设置"""
-        try:
-            self._on_sidebar_material()
-
-            if hasattr(
-                    self,
-                    'advanced_config_panel') and hasattr(
-                    self,
-                    'basic_config_panel'):
-                self.advanced_config_panel.setVisible(False)
-                self.basic_config_panel.setVisible(True)
-                self.status_bar.showMessage("基础设置模式 - 简化界面")
-
-            self._show_loop_tab_only()
-        except Exception as e:
-            logger.error(f"基础设置切换错误: {e}")
-
-    def _on_nav_advanced(self):
-        """顶部导航：高级设置"""
-        try:
-            self._on_sidebar_material()
-
-            if hasattr(
-                    self,
-                    'advanced_config_panel') and hasattr(
-                    self,
-                    'basic_config_panel'):
-                self.advanced_config_panel.setVisible(True)
-                self.basic_config_panel.setVisible(False)
-                self.status_bar.showMessage("高级设置模式 - 完整界面")
-
-            self._show_all_tabs()
-        except Exception as e:
-            logger.error(f"高级设置切换错误: {e}")
 
     def _on_nav_help(self):
         """顶部导航：帮助"""
@@ -2541,12 +2309,7 @@ class MainWindow(QMainWindow):
                 logger.info("将时间轴连接到video_preview")
                 self._connect_timeline_to_preview(self.video_preview)
 
-                if hasattr(
-                        self,
-                        'basic_config_panel') and self.basic_config_panel.isVisible():
-                    logger.info("基础模式下，不自动切换标签页")
-                else:
-                    self.preview_tabs.setCurrentIndex(3)
+                self.preview_tabs.setCurrentIndex(3)
             except Exception as e:
                 logger.error(f"加载文件出错: {e}")
         else:
@@ -2709,8 +2472,6 @@ class MainWindow(QMainWindow):
 
         nav_buttons = [
             'btn_nav_file',
-            'btn_nav_basic',
-            'btn_nav_advanced',
             'btn_nav_help']
         for btn_name in nav_buttons:
             if hasattr(self, btn_name):
@@ -2724,7 +2485,6 @@ class MainWindow(QMainWindow):
         for btn in [
                 self.btn_firmware,
                 self.btn_material,
-                self.btn_forum,
                 self.btn_about,
                 self.btn_remote,
                 self.btn_settings]:
@@ -3244,13 +3004,6 @@ class MainWindow(QMainWindow):
         if hasattr(self, '_drop_overlay'):
             self._update_drop_context()
 
-    def _get_active_config_panel(self):
-        """获取当前活动的配置面板（基础或高级）"""
-        if hasattr(self, 'basic_config_panel') and \
-                self.basic_config_panel.isVisible():
-            return self.basic_config_panel
-        return self.advanced_config_panel
-
     # ---- 拖放支持 ----
 
     def _setup_drop_support(self):
@@ -3310,7 +3063,7 @@ class MainWindow(QMainWindow):
         ext = os.path.splitext(file_path)[1].lower()
         is_image = ext in SUPPORTED_IMAGE_FORMATS
 
-        config_panel = self._get_active_config_panel()
+        config_panel = self.advanced_config_panel
 
         # 自动切换循环模式以匹配拖放文件类型
         if hasattr(config_panel, 'radio_loop_image'):
@@ -3327,7 +3080,7 @@ class MainWindow(QMainWindow):
         if is_image and hasattr(config_panel, 'loop_image_selected'):
             config_panel.loop_image_selected.emit(file_path)
         else:
-            # 基础模式无 loop_image_selected，图片也走 video_file_selected
+            # 图片无 loop_image_selected 通道，走 video_file_selected
             config_panel.video_file_selected.emit(file_path)
 
     def _handle_drop_intro(self, file_path: str):
@@ -3814,9 +3567,6 @@ class MainWindow(QMainWindow):
             self._cleanup_temp_dir()
 
             self._auto_save_service.stop()
-
-            if hasattr(self, '_forum_widget'):
-                self._forum_widget.shutdown()
 
             if hasattr(self, '_remote_page'):
                 self._remote_page.shutdown()
