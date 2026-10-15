@@ -16,30 +16,30 @@ SCREEN_HEIGHT = 640
 LOGO_WIDTH = 256
 LOGO_HEIGHT = 256
 
-VIDEO_WIDTH = 384
-VIDEO_HEIGHT = 640
-
 # ===== 分辨率规范配置 =====
+# padded_width/padded_height 是补黑边后的最终输出尺寸；padding_side 为 None 表示不补边，
+# 此时 padded_* 与 width/height 相同。若将来某个分辨率需要补边，只需填入 padding_side
+# 与对应的 padded_*，导出流程会自动启用 pad 滤镜。
 RESOLUTION_SPECS: Dict[str, Dict[str, Any]] = {
     "360x640": {
         "width": 360,
         "height": 640,
-        "padded_width": 384,
+        "padded_width": 360,
         "padded_height": 640,
-        "padding_side": "right",
-        "padding_amount": 24,
+        "padding_side": None,
+        "padding_amount": 0,
         "rotate_180": False,
-        "description": "360x640 (对齐后384x640, 右边+24px黑边)"
+        "description": "360x640"
     },
     "480x854": {
         "width": 480,
         "height": 854,
         "padded_width": 480,
-        "padded_height": 864,
-        "padding_side": "bottom",
-        "padding_amount": 10,
+        "padded_height": 854,
+        "padding_side": None,
+        "padding_amount": 0,
         "rotate_180": False,
-        "description": "480x854 (对齐后480x864, 底部+10px黑边)"
+        "description": "480x854"
     },
     "720x1080": {
         "width": 720,
@@ -49,7 +49,7 @@ RESOLUTION_SPECS: Dict[str, Dict[str, Any]] = {
         "padding_side": None,
         "padding_amount": 0,
         "rotate_180": False,
-        "description": "720x1080 (无黑边)"
+        "description": "720x1080"
     }
 }
 

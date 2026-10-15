@@ -1,6 +1,10 @@
 """
-视频处理器 - 32像素对齐和黑边处理
+视频处理器 - 分辨率缩放与 FFmpeg 编码
 融合 OpenCV 读取和 FFmpeg 编码
+
+当前内置分辨率（360x640 / 480x854 / 720x1080）均不补黑边，输出尺寸等于屏幕尺寸。
+补边流程保留，由 RESOLUTION_SPECS 的 padding_side / padded_* 驱动，
+将来新增需要补边的分辨率时在配置中填入即可自动生效。
 """
 import subprocess
 import sys
@@ -62,12 +66,14 @@ class VideoInfo:
 
 class VideoProcessor:
     """
-    视频处理器 - 实现32像素对齐
+    视频处理器 - 按 RESOLUTION_SPECS 缩放并编码视频
 
-    分辨率处理规则：
-    - 360x640 -> 384x640 (右边加24px黑边)
-    - 480x854 -> 480x864 (下边加10px黑边)
-    - 720x1080 -> 720x1080 (旋转180度)
+    分辨率处理规则（当前均不补黑边）：
+    - 360x640  -> 360x640
+    - 480x854  -> 480x854
+    - 720x1080 -> 720x1080
+
+    若某规格的 padding_side 非 None，则按其 padded_width/padded_height 补黑边。
     """
 
     def __init__(self, ffmpeg_path: str = "ffmpeg", ffprobe_path: str = "ffprobe"):
@@ -176,7 +182,9 @@ class VideoProcessor:
         progress_callback: Optional[Callable[[float, str], None]] = None
     ) -> Tuple[bool, str]:
         """
-        处理视频：添加黑边实现32像素对齐
+        处理视频：按目标分辨率缩放
+
+        是否补黑边由 RESOLUTION_SPECS 的 padding_side 决定（为 None 时不补）。
 
         Args:
             input_path: 输入视频路径
@@ -302,7 +310,7 @@ class VideoProcessor:
             resolution: 分辨率字符串
 
         Returns:
-            包含原始和目标分辨率信息的字典
+            包含原始和目标分辨率信息的字典（未启用补边时 target 与 original 相同）
         """
         spec = get_resolution_spec(resolution)
 

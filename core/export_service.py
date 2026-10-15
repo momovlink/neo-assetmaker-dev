@@ -227,9 +227,10 @@ class ExportWorker(QThread):
         spec = get_resolution_spec(params.resolution)
         target_w = spec["width"]
         target_h = spec["height"]
-        padded_w = spec["padded_width"]
-        padded_h = spec["padded_height"]
         padding_side = spec["padding_side"]
+        # padding_side 为 None 表示该分辨率不补边，传 0 让 _run_ffmpeg_crf 跳过 pad 滤镜
+        padded_w = spec["padded_width"] if padding_side else 0
+        padded_h = spec["padded_height"] if padding_side else 0
         rotate_180 = spec["rotate_180"]
 
         temp_dir = os.path.join(self._output_dir, "_temp_frames").replace("\\", "/")
@@ -371,6 +372,8 @@ class ExportWorker(QThread):
 
         当 padded_w/padded_h 非零时，使用 -vf pad 滤镜添加黑边，
         替代之前逐帧 numpy 拼接的方式，性能更优。
+        调用方仅在 RESOLUTION_SPECS 的 padding_side 非 None 时传入非零值，
+        否则保持 0 以跳过 pad 滤镜（pad 到与输入相同的尺寸是无操作）。
         参考: https://ffmpeg.org/ffmpeg-filters.html#pad
         """
         crf_value = 26
@@ -451,9 +454,10 @@ class ExportWorker(QThread):
         spec = get_resolution_spec(params.resolution)
         target_w = spec["width"]
         target_h = spec["height"]
-        padded_w = spec["padded_width"]
-        padded_h = spec["padded_height"]
         padding_side = spec["padding_side"]
+        # padding_side 为 None 表示该分辨率不补边，传 0 让 _run_ffmpeg_crf 跳过 pad 滤镜
+        padded_w = spec["padded_width"] if padding_side else 0
+        padded_h = spec["padded_height"] if padding_side else 0
         rotate_180 = spec["rotate_180"]
 
         image_path = params.video_path
